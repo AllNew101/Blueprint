@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Opmode.Blueprint;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-
 import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -12,26 +10,25 @@ public class Distance {
     public double[] Red_Goal = {100 , 20 ,50}; // x,y,theta
     public double[] Blue_Goal = {100 , 20 ,50}; // x,y,theta
 
-    public double distance,deltaX,deltaY;
-
+    public double distance,deltaX,deltaY,Theta;
     public void init (ElapsedTime elapsedTime){
         time = elapsedTime;
     }
 
-    public double Pythagoras (double X,double Y,String Goal){
-        if (Goal.equals("red")) {
-            deltaX = Math.abs(X - Red_Goal[0]);
-            deltaY = Math.abs(Y - Red_Goal[1]);
-            distance = Math.sqrt(Math.pow(deltaX,2) + Math.pow(deltaY,2));
+    public double[] Pythagoras (double X,double Y,double robot_theta,boolean Goal_red){
+        if (Goal_red) {
+            deltaX = Red_Goal[0] - X;
+            deltaY = Red_Goal[1] - Y;
+            distance = Math.hypot(deltaX,deltaY);
         }
-        return distance;
+        else if (!Goal_red) {
+            deltaX = Blue_Goal[0] - X;
+            deltaY = Blue_Goal[1] - Y;
+            distance = Math.hypot(deltaX,deltaY);
+        }
+        Theta = Math.toDegrees(Math.atan2(deltaY,deltaX) - robot_theta);
+        double[] pythagoras = {distance,Theta};
+        return pythagoras;
     }
 
-    public void Theta_cal (){
-
-    }
-
-    public void Goal_dis (){
-
-    }
 }
