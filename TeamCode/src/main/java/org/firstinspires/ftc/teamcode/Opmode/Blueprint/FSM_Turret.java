@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.Opmode.Blueprint;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+@Config
 public class FSM_Turret {
+
+    public static double Idle_target = 0;
+
     public enum Current_State{
         Idle_state,
         Lock
@@ -18,8 +24,13 @@ public class FSM_Turret {
     public void init (HardwareMap hardwareMap, ElapsedTime elapsedTime){
         PID = new PID_Turret();
         time = elapsedTime;
+        motor1 = hardwareMap.get(DcMotorEx.class, "Turret");
+        PID.init(time);
+        current_state = Current_State.Idle_state;
 
-        motor1 = hardwareMap.get(DcMotorEx.class, "Motor1");
+        motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void command(Current_State state){
@@ -29,13 +40,14 @@ public class FSM_Turret {
     public void update_state(double target_theta){
         switch (current_state){
             case Idle_state:
-                PID.PIDF (0, motor1.getCurrentPosition());
+//                motor1.setPower(PID.PIDF(Idle_target, motor1.getCurrentPosition()));
                 break;
             case Lock :
-                PID.PIDF(target_theta, motor1.getCurrentPosition());
+                motor1.setPower(PID.PIDF(target_theta, motor1.getCurrentPosition()));
                 break;
 
-
         }
+
+
     }
 }

@@ -9,12 +9,14 @@ import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.Distance;
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.FSM_Lift;
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.FSM_Turret;
+import org.firstinspires.ftc.teamcode.Opmode.System.TelemetryX;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.function.Supplier;
 
@@ -25,19 +27,26 @@ public class Drive extends OpMode {
     Drawing drawing;
     Follower follower;
     Supplier<PathChain> Auto_drive;
+    TelemetryX telemetryX;
     ElapsedTime time;
     FSM_Lift FSM_lift;
     FSM_Turret FSM_turret;
     Distance distance;
+    DcMotorEx motor1;
 
     public double target_turret,robot_goal_dis;
     public boolean Goal_red = true;
+    public boolean check_turret = false;
+    public boolean check_tri = true;
 
+    private double [] pytha ;
     private boolean automatedDrive = false;
     public static double[] multiplier = {1, 1, 0.5};
     public static Pose startingPose = new Pose (72,72,Math.toRadians(-90));
 
-
+    private double Per_round = 537.7;
+    private double gear_motor = 39;
+    private double gear_turret = 89;
 
     @Override
     public void init() {
@@ -45,30 +54,33 @@ public class Drive extends OpMode {
         FSM_lift = new FSM_Lift();
         FSM_turret = new FSM_Turret();
         distance = new Distance();
+        telemetryX = new TelemetryX();
+        motor1 = hardwareMap.get(DcMotorEx.class, "Turret");
 
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();
         time.reset();
-        time.startTime();
 
-
-        FSM_lift.init(hardwareMap,time);
+//        FSM_lift.init(hardwareMap,time);
         FSM_turret.init(hardwareMap,time);
+        distance.init(time);
+        telemetryX.init(telemetry);
     }
 
     @Override
     public void start() {
+        follower.startTeleOpDrive();
     }
 
     @Override
     public void loop() {
         follower.update();
-        FSM_lift.update_state();
+//        FSM_lift.update_state();
+        pytha = distance.Pythagoras(follower.getPose().getX(), follower.getPose().getY(),follower.getHeading(),Goal_red);
+        target_turret = pytha[1];
+        robot_goal_dis = pytha[0];
         FSM_turret.update_state(target_turret);
-        target_turret = distance.Pythagoras(follower.getPose().getX(), follower.getPose().getY(),follower.getHeading(),Goal_red)[1];
-        robot_goal_dis = distance.Pythagoras(follower.getPose().getX(), follower.getPose().getY(),follower.getHeading(),Goal_red)[0];
-
 
         if (!automatedDrive) {
             follower.setTeleOpDrive(
@@ -78,9 +90,23 @@ public class Drive extends OpMode {
                     true // Robot Centric
             );
         }
-        if (gamepad1.circle){FSM_lift.Lift_command(FSM_Lift.Current_State.Up_max);}
+//        if (gamepad1.circle){FSM_lift.Lift_command(FSM_Lift.Current_State.Up_max);}
+//        if (gamepad1.triangle && check_tri){check_turret = !check_turret;  check_tri = false;}
+//        else if (!gamepad1.triangle) {check_tri = true;}
+//
+//        if (check_turret) {FSM_turret.command(FSM_Turret.Current_State.Lock);}
+//        else if (!check_turret) {FSM_turret.command(FSM_Turret.Current_State.Idle_state);}
+        ////////////////////////////////////////////////////////
+        if (gamepad1.optionsWasPressed()){Goal_red = !Goal_red;}
 
-        if (gamepad2.options){Goal_red = !Goal_red;}
 
-}
+        telemetryX.addData("Turret_on",check_turret,2);
+        telemetryX.addData("Turret_Theta",pytha[1],2);
+        telemetryX.addData("Turret_posi",convert_current_to_degree(motor1.getCurrentPosition()),2);
+        telemetryX.update();
+
+    }
+    public double convert_current_to_degree(double motor_posi){
+        return (motor_posi / Per_round) * 360 * gear_motor / gear_turret;
+    }
 }

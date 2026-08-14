@@ -22,8 +22,8 @@ public class FSM_Lift {
 
 
     public void init (HardwareMap hardwareMap , ElapsedTime elapsedTime){
-        motor1 = hardwareMap.get(DcMotorEx.class, "Motor1");
-        motor2 = hardwareMap.get(DcMotorEx.class, "Motor2");
+//        motor1 = hardwareMap.get(DcMotorEx.class, "Motor1");
+//        motor2 = hardwareMap.get(DcMotorEx.class, "Motor2");
         time = elapsedTime;
 
         PID = new PID_Lift();

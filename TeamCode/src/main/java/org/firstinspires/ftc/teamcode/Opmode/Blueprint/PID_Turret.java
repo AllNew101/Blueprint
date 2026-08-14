@@ -6,23 +6,24 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 @Config
 public class PID_Turret {
-    public static double kp = 0 ;
-    public static double ki = 0 ;
-    public static double kd = 0 ;
-    public static double kf = 0 ;
-    public static double kp_sec = 0 ;
-    public static double ki_sec = 0 ;
-    public static double kd_sec = 0 ;
-    public static double kf_sec = 0 ;//feedforward
-    public static double kg = 0 ;//gravity force
     public static double Max_angle = 120;
     public static double Min_angle = -120;
+    public static double kd = 0;
+    public static double kd_sec = 0.0012;
+    public static double kf = 0.17;
+    public static double ki = 0;
+    public static double ki_sec = 0;
+    public static double kp = 0.02;
+    public static double kp_sec = 0.01;
+
+
+
 
     private double previous_error, error, delta_error, integral, previous_time, delta_time, power_motor;
     private boolean Check_limit;
-    private double Per_round = 0;
-    private double gear_motor = 0;
-    private double gear_turret = 0;
+    private double Per_round = 537.7;
+    private double gear_motor = 39;
+    private double gear_turret = 89;
     private ElapsedTime time;
 
     public void init (ElapsedTime elapsedTime){
@@ -42,11 +43,11 @@ public class PID_Turret {
         delta_error = error - previous_error;
         integral += error*delta_time;
 
-        if (Math.abs(error) > 4) {
-            if (Math.abs(error) > 30) {
-                power_motor = (kp * error) + (ki * integral) + (kd * (delta_error / delta_time)) + (kf * Math.signum(error)) + kg;
+        if (Math.abs(error) > 2) {
+            if (Math.abs(error) > 5) {
+                power_motor = (kp * error) + (ki * integral) + (kd * (delta_error / delta_time)) + (kf * Math.signum(error));
             } else {
-                power_motor = (kp_sec * error) + (ki_sec * integral) + (kd_sec * (delta_error / delta_time)) + (kf_sec * Math.signum(error)) + kg;
+                power_motor = (kp_sec * error) + (ki_sec * integral) + (kd_sec * (delta_error / delta_time)) + (kf * Math.signum(error));
             }
         }
 
