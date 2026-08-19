@@ -30,7 +30,7 @@ public class FSM_Turret {
 
         motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void command(Current_State state){
@@ -40,7 +40,7 @@ public class FSM_Turret {
     public void update_state(double target_theta){
         switch (current_state){
             case Idle_state:
-//                motor1.setPower(PID.PIDF(Idle_target, motor1.getCurrentPosition()));
+                motor1.setPower(PID.PIDF(Idle_target, motor1.getCurrentPosition()));
                 break;
             case Lock :
                 motor1.setPower(PID.PIDF(target_theta, motor1.getCurrentPosition()));

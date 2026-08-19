@@ -25,7 +25,7 @@ public class Distance {
     public double[] Pythagoras (double X,double Y,double robot_theta,boolean Goal_red){
         if (Goal_red) {
             deltaX = Red_Goal[0] - X;// X_robot
-            deltaY = Y - Red_Goal[1];// Y_robot
+            deltaY = Red_Goal[1] - Y;// Y_robot
             distance = Math.hypot(deltaX,deltaY);// c^2 = a^2 + b^2
         }
         else if (!Goal_red) {
@@ -33,9 +33,9 @@ public class Distance {
             deltaY = Blue_Goal[1] - Y;
             distance = Math.hypot(deltaX,deltaY);
         }
-        Theta = Math.floor(Math.atan2(deltaY,deltaX) / Math.PI * 180);
-        robot = robot_theta / Math.PI * 180;
-        Target_Theta = AngleUnit.normalizeDegrees(Theta + robot);
+        Theta = Math.round(Math.toDegrees(Math.atan2(deltaY,deltaX)));
+        robot =  Math.round(Math.toDegrees(robot_theta));
+        Target_Theta = AngleUnit.normalizeDegrees(Theta - robot);
 
         if (Target_Theta > Max_angle){Target_Theta = Max_angle;}
         else if (Target_Theta < Min_angle) {Target_Theta = Min_angle;}

@@ -42,7 +42,7 @@ public class Drive extends OpMode {
     private double [] pytha ;
     private boolean automatedDrive = false;
     public static double[] multiplier = {1, 1, 0.5};
-    public static Pose startingPose = new Pose (72,72,Math.toRadians(-90));
+    public static Pose startingPose = new Pose (72,-72,Math.toRadians(0));
 
     private double Per_round = 537.7;
     private double gear_motor = 39;
@@ -50,6 +50,7 @@ public class Drive extends OpMode {
 
     @Override
     public void init() {
+        drawing = new Drawing();
         time = new ElapsedTime();
         FSM_lift = new FSM_Lift();
         FSM_turret = new FSM_Turret();
@@ -77,7 +78,7 @@ public class Drive extends OpMode {
     public void loop() {
         follower.update();
 //        FSM_lift.update_state();
-        pytha = distance.Pythagoras(follower.getPose().getX(), follower.getPose().getY(),follower.getHeading(),Goal_red);
+        pytha = distance.Pythagoras(follower.getPose().getX(), follower.getPose().getY(),follower.getPose().getHeading(),Goal_red);
         target_turret = pytha[1];
         robot_goal_dis = pytha[0];
         FSM_turret.update_state(target_turret);
@@ -91,17 +92,22 @@ public class Drive extends OpMode {
             );
         }
 //        if (gamepad1.circle){FSM_lift.Lift_command(FSM_Lift.Current_State.Up_max);}
-//        if (gamepad1.triangle && check_tri){check_turret = !check_turret;  check_tri = false;}
-//        else if (!gamepad1.triangle) {check_tri = true;}
-//
-//        if (check_turret) {FSM_turret.command(FSM_Turret.Current_State.Lock);}
-//        else if (!check_turret) {FSM_turret.command(FSM_Turret.Current_State.Idle_state);}
+        if (gamepad1.triangle && check_tri){check_turret = !check_turret;  check_tri = false;}
+        else if (!gamepad1.triangle) {check_tri = true;}
+
+        if (check_turret) {FSM_turret.command(FSM_Turret.Current_State.Lock);}
+        else if (!check_turret) {FSM_turret.command(FSM_Turret.Current_State.Idle_state);}
         ////////////////////////////////////////////////////////
         if (gamepad1.optionsWasPressed()){Goal_red = !Goal_red;}
 
+        drawing.drawRobot(follower.getPose(), "red");
+        drawing.sendPacket();
 
+        telemetryX.addData("X_robot",follower.getPose().getX(),2);
+        telemetryX.addData("Y_robot",follower.getPose().getY(),2);
+        telemetryX.addData("Theta_robot",Math.toDegrees(follower.getPose().getHeading()),2);
         telemetryX.addData("Turret_on",check_turret,2);
-        telemetryX.addData("Turret_Theta",pytha[1],2);
+        telemetryX.addData("Target_Theta",pytha[1],2);
         telemetryX.addData("Turret_posi",convert_current_to_degree(motor1.getCurrentPosition()),2);
         telemetryX.update();
 
