@@ -11,7 +11,6 @@ public class PID_Lift {
     public static double kp = 0 ;
     public static double ki = 0 ;
     public static double kd = 0 ;
-    public static double kf = 0 ;
     public static double kg = 0 ;//gravity force
 
     private double previous_error, error, delta_error, integral, previous_time, delta_time, power_motor;
@@ -28,7 +27,7 @@ public class PID_Lift {
         delta_error = error - previous_error;
         integral += error*delta_time;
 
-        power_motor = (kp*error) + (ki*integral) + (kd*(delta_error/delta_time)) + (kf * Math.signum(error)) + kg;
+        power_motor = (kp*error) + (ki*integral) + (kd*(delta_error/delta_time)) + kg;
         previous_time = time.seconds();
         previous_error = error;
         return power_motor;
