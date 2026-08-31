@@ -11,7 +11,7 @@ public class PID_velo {
     public static double kp = 0 ;
     public static double ki = 0 ;
     public static double kd = 0 ;
-    public static double kv = 0 ;// start power
+    public static double kf = 0 ;// start power
 
     private double previous_error, error, delta_error, integral, previous_time, delta_time, power_motor;
     private DcMotorEx motor1;
@@ -30,12 +30,9 @@ public class PID_velo {
         delta_error = error - previous_error;
         integral += error*delta_time;
 
-        power_motor = (kp*error) + (ki*integral) + (kd*(delta_error/delta_time)) + (kv * target_velo);
+        power_motor = (kp*error) + (ki*integral) + (kd*(delta_error/delta_time)) + (kf * Math.signum(error));
         previous_time = time.seconds();
         previous_error = error;
         return power_motor;
-    }
-    public void set_velo (double power){
-        motor1.setPower(power);
     }
 }

@@ -27,7 +27,6 @@ public class Drive extends OpMode {
     TelemetryX telemetryX;
     DcMotorEx FL,FR,BL,BR,intake;
     double x_joy,y_joy,rx_joy;
-    boolean check_x = true;
     boolean check_intake = false;
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,12 +110,9 @@ public class Drive extends OpMode {
         BL.setPower( y_joy - x_joy + rx_joy );
         BR.setPower( y_joy + x_joy - rx_joy );
         ////////////////////////////////////////////////////////////////////////////////////////////
-
         if (gamepad1.crossWasPressed()){check_intake = !check_intake; }
         if (check_intake){intake.setPower(1);}
         else if (!check_intake) {intake.setPower(0);}
-
-
         ////////////////////////////////////////////////////////////////////////////////////////////
         telemetryX.addData("X_joy",x_joy,2);
         telemetryX.addData("Y_joy",y_joy,2);
@@ -126,9 +122,6 @@ public class Drive extends OpMode {
         telemetryX.addData("FR_wheel",FR.getPower(),2);
         telemetryX.addData("BL_wheel",BL.getPower(),2);
         telemetryX.addData("BR_wheel",BR.getPower(),2);
-
-
-
     }
     ////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
