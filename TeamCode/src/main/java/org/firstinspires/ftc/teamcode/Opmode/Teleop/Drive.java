@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.Distance;
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.FSM_Lift;
 import org.firstinspires.ftc.teamcode.Opmode.Blueprint.FSM_Turret;
+import org.firstinspires.ftc.teamcode.Opmode.Blueprint.Test_sensor;
 import org.firstinspires.ftc.teamcode.Opmode.System.TelemetryX;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.function.Supplier;
@@ -25,9 +26,7 @@ import java.util.function.Supplier;
 @TeleOp
 public class Drive extends OpMode {
     TelemetryX telemetryX;
-    DcMotorEx FL,FR,BL,BR,intake;
-    double x_joy,y_joy,rx_joy;
-    boolean check_intake = false;
+    Test_sensor check_ball;
     ////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,19 +57,11 @@ public class Drive extends OpMode {
 
     @Override
     public void init() {
-        FL = hardwareMap.get(DcMotorEx.class, "Front_L");
-        FR = hardwareMap.get(DcMotorEx.class, "Front_R");
-        BL = hardwareMap.get(DcMotorEx.class, "Back_L");
-        BR = hardwareMap.get(DcMotorEx.class, "Back_R");
-        intake = hardwareMap.get(DcMotorEx.class, "Intake");
-
-        FL.setDirection(DcMotorSimple.Direction.REVERSE);
-        BL.setDirection(DcMotorSimple.Direction.REVERSE);
-        BR.setDirection(DcMotorSimple.Direction.REVERSE);
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
         telemetryX = new TelemetryX();
+        check_ball = new Test_sensor();
 
         telemetryX.init(telemetry);
+        check_ball.init(hardwareMap,telemetryX);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,7 +78,7 @@ public class Drive extends OpMode {
 //        follower = Constants.createFollower(hardwareMap);
 //        follower.setStartingPose(startingPose);
 //        follower.update();
-//        time.reset();
+//        time.reset();telemetryX.init(telemetry);
 //
 ////        FSM_lift.init(hardwareMap,time);
 //        FSM_turret.init(hardwareMap, time);
@@ -102,26 +93,11 @@ public class Drive extends OpMode {
 
     @Override
     public void loop() {
-        x_joy = gamepad1.left_stick_x;
-        y_joy = -gamepad1.left_stick_y;
-        rx_joy = gamepad1.right_stick_x;
-        FL.setPower( y_joy + x_joy + rx_joy );
-        FR.setPower( y_joy - x_joy - rx_joy );
-        BL.setPower( y_joy - x_joy + rx_joy );
-        BR.setPower( y_joy + x_joy - rx_joy );
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        if (gamepad1.crossWasPressed()){check_intake = !check_intake; }
-        if (check_intake){intake.setPower(1);}
-        else if (!check_intake) {intake.setPower(0);}
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        telemetryX.addData("X_joy",x_joy,2);
-        telemetryX.addData("Y_joy",y_joy,2);
-        telemetryX.addData("RX_joy",rx_joy,2);
-        telemetryX.addData("Drive_motor","////////",2);
-        telemetryX.addData("FL_wheel",FL.getPower(),2);
-        telemetryX.addData("FR_wheel",FR.getPower(),2);
-        telemetryX.addData("BL_wheel",BL.getPower(),2);
-        telemetryX.addData("BR_wheel",BR.getPower(),2);
+
+        check_ball.check_ball();
+        check_ball.telemetry_checkball();
+        check_ball.telemetry_HSV_value();
+        telemetryX.update();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////
